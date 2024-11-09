@@ -14,8 +14,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 enable_testing()
 add_subdirectory(gflags)
-add_subdirectory(googletest)
 add_subdirectory(glog)
+add_subdirectory(googletest)
 add_subdirectory(parlaylib)
 
 configure_file(dc3_config.h.in dc3_config.h)
