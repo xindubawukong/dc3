@@ -1,5 +1,7 @@
+.codex
 .DS_Store
 build/
 .vscode
 .cache
 logs/*
+

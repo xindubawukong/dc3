@@ -1,11 +1,10 @@
 #include "dc3.h"
 
+#include <cstdlib>
 #include <iostream>
 #include <random>
+#include <string>
 
-#include "dc3_config.h"
-#include "gflags/gflags.h"
-#include "glog/logging.h"
 #include "parlay/internal/get_time.h"
 #include "parlay/primitives.h"
 #include "parlay/sequence.h"
@@ -13,7 +12,7 @@
 using namespace std;
 
 bool TestDC3(int n, int alpha) {
-  LOG(INFO) << "n: " << n << endl;
+  cout << "n: " << n << endl;
   std::mt19937 rng(0);
   auto a = parlay::sequence<unsigned int>(n);
   for (int i = 0; i < n; i++) {
@@ -21,7 +20,7 @@ bool TestDC3(int n, int alpha) {
   }
   double x = 0, y = 0;
   for (int rr = 0; rr < 5; rr++) {
-    LOG(INFO) << "round: " << rr << endl;
+    cout << "round: " << rr << endl;
     parlay::internal::timer tt;
     auto sa1 = suffix_array(a);
     x += tt.stop();
@@ -34,21 +33,28 @@ bool TestDC3(int n, int alpha) {
     }
   }
   x /= 5, y /= 5;
-  LOG(INFO) << "parlay SA: " << x << endl;
-  LOG(INFO) << "DC3: " << y << endl;
-  LOG(INFO) << "rate: " << y / x << endl;
+  cout << "parlay SA: " << x << endl;
+  cout << "DC3: " << y << endl;
+  cout << "rate: " << y / x << endl;
   return true;
 }
 
-DEFINE_int32(n, 10000, "n");
-DEFINE_validator(n, [](const char *flagname, int n) { return n > 0; });
-
 int main(int argc, char *argv[]) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
-  FLAGS_log_dir = CMAKE_CURRENT_SOURCE_DIR "/logs";
-  FLAGS_alsologtostderr = 1;
-  google::InitGoogleLogging(argv[0]);
-  CHECK(TestDC3(FLAGS_n, min(128, FLAGS_n)));
-  LOG(INFO) << "Test Pass!" << endl;
+  int n = 10000;
+  if (argc == 2) {
+    n = stoi(argv[1]);
+  } else if (argc != 1) {
+    cerr << "usage: " << argv[0] << " [n]" << endl;
+    return EXIT_FAILURE;
+  }
+  if (n <= 0) {
+    cerr << "n must be positive" << endl;
+    return EXIT_FAILURE;
+  }
+  if (!TestDC3(n, min(128, n))) {
+    cerr << "Test failed" << endl;
+    return EXIT_FAILURE;
+  }
+  cout << "Test Pass!" << endl;
   return 0;
 }
